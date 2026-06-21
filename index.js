@@ -46,6 +46,7 @@ const DB = {
       cover: item.cover || oldEntry.cover || '',
       synopsis: item.synopsis || oldEntry.synopsis || '',
       genres: item.genres || oldEntry.genres || [],
+      databaseScore: item.databaseScore || oldEntry.databaseScore || '',
       score: oldEntry.score || '',
       status,
       notes: oldEntry.notes || '',
@@ -91,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (page === 'moments') initMomentsPage();
 });
 
-/* GENERAL */
+/* GENERAL HELPERS */
 
 function getParams() {
   return Object.fromEntries(new URLSearchParams(window.location.search).entries());
@@ -217,14 +218,14 @@ function normalizeBook(book, forcedType = 'Book') {
 /* API */
 
 const API = {
-  async searchManga({ query, genre, author, sort, page, type }) {
+  async searchManga({ query, genre, author, sort, page = 1, type = 'manga', limit = 24 }) {
     const params = new URLSearchParams();
 
-    params.set('page', page);
-    params.set('limit', '20');
+    params.set('page', String(page));
+    params.set('limit', String(limit));
     params.set('sfw', 'true');
 
-    let searchText = query || '';
+    let searchText = query && query.trim() ? query.trim() : '';
 
     if (author) {
       searchText += ' ' + author;
@@ -248,7 +249,7 @@ const API = {
     };
 
     if (genre && genreMap[genre]) {
-      params.set('genres', genreMap[genre]);
+      params.set('genres', String(genreMap[genre]));
     }
 
     if (type === 'lightnovels') {
@@ -269,7 +270,7 @@ const API = {
     const response = await fetch(`${JIKAN}/manga?${params}`);
 
     if (!response.ok) {
-      throw new Error('Manga search failed');
+      throw new Error(`Manga search failed: ${response.status}`);
     }
 
     const data = await response.json();
@@ -281,13 +282,21 @@ const API = {
     };
   },
 
-  async searchBooks({ query, genre, author, sort, page, type }) {
-    const startIndex = (page - 1) * 20;
+  async searchBooks({ query, genre, author, sort, page = 1, type = 'books', limit = 24 }) {
+    const startIndex = (page - 1) * limit;
 
-    let q = query || 'popular books';
+    let q = query && query.trim() ? query.trim() : '';
+
+    if (!q) {
+      if (type === 'comics') {
+        q = 'graphic novels comics';
+      } else {
+        q = 'bestseller fiction';
+      }
+    }
 
     if (genre) {
-      q += ` subject:${genre}`;
+      q += ` ${genre}`;
     }
 
     if (author) {
@@ -295,29 +304,31 @@ const API = {
     }
 
     if (type === 'comics') {
-      q += ' subject:comics';
+      q += ' comics graphic novel';
     }
 
     const params = new URLSearchParams();
 
     params.set('q', q);
     params.set('printType', 'books');
-    params.set('maxResults', '20');
-    params.set('startIndex', startIndex);
+    params.set('maxResults', String(limit));
+    params.set('startIndex', String(startIndex));
     params.set('orderBy', sort === 'newest' ? 'newest' : 'relevance');
 
     const response = await fetch(`${GBOOKS}/volumes?${params}`);
 
     if (!response.ok) {
-      throw new Error('Books search failed');
+      throw new Error(`Books search failed: ${response.status}`);
     }
 
     const data = await response.json();
 
     return {
-      items: (data.items || []).map(book => normalizeBook(book, type === 'comics' ? 'Comic' : 'Book')),
+      items: (data.items || []).map(book =>
+        normalizeBook(book, type === 'comics' ? 'Comic' : 'Book')
+      ),
       total: data.totalItems || 0,
-      pages: Math.max(1, Math.ceil((data.totalItems || 0) / 20))
+      pages: Math.max(1, Math.ceil((data.totalItems || 0) / limit))
     };
   },
 
@@ -325,7 +336,7 @@ const API = {
     const response = await fetch(`${JIKAN}/manga/${id}/full`);
 
     if (!response.ok) {
-      throw new Error('Manga detail failed');
+      throw new Error(`Manga detail failed: ${response.status}`);
     }
 
     const data = await response.json();
@@ -333,16 +344,16 @@ const API = {
     return normalizeManga(data.data);
   },
 
-  async getBookDetail(id) {
+  async getBookDetail(id, forcedType = 'Book') {
     const response = await fetch(`${GBOOKS}/volumes/${id}`);
 
     if (!response.ok) {
-      throw new Error('Book detail failed');
+      throw new Error(`Book detail failed: ${response.status}`);
     }
 
     const data = await response.json();
 
-    return normalizeBook(data);
+    return normalizeBook(data, forcedType);
   }
 };
 
@@ -408,52 +419,119 @@ async function runDatabaseSearch() {
   const author = document.getElementById('author-filter').value.trim();
   const sort = document.getElementById('sort-filter').value;
 
-  grid.innerHTML = renderSkeletonCards(12);
+  grid.innerHTML = renderSkeletonCards(24);
   pagination.innerHTML = '';
-  resultCount.textContent = 'Searching...';
+  resultCount.textContent = 'Loading titles...';
 
   try {
     let result;
 
-    const searchData = {
+    const baseSearchData = {
       query,
-      type,
       genre,
       author,
       sort,
       page: searchPage
     };
 
-    if (type === 'books' || type === 'comics') {
-      result = await API.searchBooks(searchData);
-    } else if (type === 'manga' || type === 'lightnovels') {
-      result = await API.searchManga(searchData);
+    if (type === 'manga') {
+      result = await API.searchManga({
+        ...baseSearchData,
+        type: 'manga',
+        limit: 24
+      });
+    } else if (type === 'lightnovels') {
+      result = await API.searchManga({
+        ...baseSearchData,
+        type: 'lightnovels',
+        limit: 24
+      });
+    } else if (type === 'books') {
+      result = await API.searchBooks({
+        ...baseSearchData,
+        type: 'books',
+        limit: 24
+      });
+    } else if (type === 'comics') {
+      result = await API.searchBooks({
+        ...baseSearchData,
+        type: 'comics',
+        limit: 24
+      });
     } else {
-      const [manga, books] = await Promise.all([
-        API.searchManga(searchData).catch(() => ({ items: [], total: 0, pages: 1 })),
-        API.searchBooks(searchData).catch(() => ({ items: [], total: 0, pages: 1 }))
+      const [manga, books, comics, lightnovels] = await Promise.all([
+        API.searchManga({
+          ...baseSearchData,
+          type: 'manga',
+          limit: 6
+        }).catch(error => {
+          console.error('Manga API failed:', error);
+          return { items: [], total: 0, pages: 1 };
+        }),
+
+        API.searchBooks({
+          ...baseSearchData,
+          type: 'books',
+          limit: 6
+        }).catch(error => {
+          console.error('Books API failed:', error);
+          return { items: [], total: 0, pages: 1 };
+        }),
+
+        API.searchBooks({
+          ...baseSearchData,
+          type: 'comics',
+          limit: 6
+        }).catch(error => {
+          console.error('Comics API failed:', error);
+          return { items: [], total: 0, pages: 1 };
+        }),
+
+        API.searchManga({
+          ...baseSearchData,
+          type: 'lightnovels',
+          limit: 6
+        }).catch(error => {
+          console.error('Light Novels API failed:', error);
+          return { items: [], total: 0, pages: 1 };
+        })
       ]);
 
       result = {
-        items: [...manga.items.slice(0, 10), ...books.items.slice(0, 10)],
-        total: manga.total + books.total,
-        pages: Math.max(manga.pages, books.pages)
+        items: [
+          ...manga.items,
+          ...books.items,
+          ...comics.items,
+          ...lightnovels.items
+        ],
+        total: manga.total + books.total + comics.total + lightnovels.total,
+        pages: Math.max(
+          manga.pages,
+          books.pages,
+          comics.pages,
+          lightnovels.pages
+        )
       };
     }
 
     if (!result.items.length) {
       resultCount.textContent = '';
+
       grid.innerHTML = `
         <div class="empty-state" style="grid-column: 1 / -1;">
           <i class="ti ti-search-off"></i>
           <h3>No results found</h3>
-          <p>Try a different title, author, type, or genre.</p>
+          <p>Try a title like Naruto, One Piece, Batman, Harry Potter, or The Hobbit.</p>
         </div>
       `;
+
       return;
     }
 
-    resultCount.textContent = `Showing ${result.items.length} result${result.items.length === 1 ? '' : 's'}`;
+    const shown = result.items.length;
+    const total = result.total || shown;
+
+    resultCount.textContent = `Showing ${shown} of ${total.toLocaleString()} result${total === 1 ? '' : 's'}`;
 
     grid.innerHTML = result.items.map(renderSearchCard).join('');
 
@@ -472,7 +550,7 @@ async function runDatabaseSearch() {
       <div class="empty-state" style="grid-column: 1 / -1;">
         <i class="ti ti-alert-circle"></i>
         <h3>Search failed</h3>
-        <p>Please try again in a moment.</p>
+        <p>The database needs internet access. Try again in a moment.</p>
       </div>
     `;
   }
@@ -484,7 +562,7 @@ function renderSearchCard(item) {
     : `<div class="card-cover-placeholder"><i class="ti ti-book-2"></i></div>`;
 
   return `
-    <a class="card" href="detail.html?id=${encodeURIComponent(item.id)}">
+    <a class="card" href="detail.html?id=${encodeURIComponent(item.id)}&type=${encodeURIComponent(item.type || '')}">
       ${cover}
 
       <div class="card-body">
@@ -497,10 +575,12 @@ function renderSearchCard(item) {
   `;
 }
 
-function renderSkeletonCards(count) {
+function renderSkeletonCards(count = 24) {
   return Array.from({ length: count }, () => `
     <div class="card">
-      <div class="card-cover-placeholder"></div>
+      <div class="card-cover-placeholder">
+        <i class="ti ti-book-2"></i>
+      </div>
       <div class="card-body">
         <div class="skeleton-line"></div>
         <div class="skeleton-line short"></div>
@@ -616,6 +696,7 @@ function renderLibrary() {
         </a>
       </div>
     `;
+
     return;
   }
 
@@ -712,6 +793,7 @@ function updateScore(id, value) {
 /* DETAIL PAGE */
 
 async function initDetailPage() {
+  const params = getParams();
   const id = currentItemId();
   const content = document.getElementById('detail-content');
 
@@ -740,7 +822,8 @@ async function initDetailPage() {
     } else if (id.startsWith('manga_')) {
       item = await API.getMangaDetail(id.replace('manga_', ''));
     } else if (id.startsWith('book_')) {
-      item = await API.getBookDetail(id.replace('book_', ''));
+      const forcedType = params.type === 'Comic' ? 'Comic' : 'Book';
+      item = await API.getBookDetail(id.replace('book_', ''), forcedType);
     } else {
       renderMissingDetail();
       return;
@@ -905,7 +988,7 @@ function renderMissingDetail() {
   `;
 }
 
-/* NOTES */
+/* NOTES PAGE */
 
 function initNotesPage() {
   const item = DB.getEntry(currentItemId());
@@ -933,7 +1016,7 @@ function saveNotesPage() {
   showToast('Notes saved');
 }
 
-/* QUOTES */
+/* QUOTES PAGE */
 
 function initQuotesPage() {
   const item = DB.getEntry(currentItemId());
@@ -999,6 +1082,7 @@ function renderQuotesPageList() {
         <p>Add your first favourite quote above.</p>
       </div>
     `;
+
     return;
   }
 
@@ -1032,7 +1116,7 @@ function deleteQuotePage(index) {
   showToast('Quote deleted');
 }
 
-/* MOMENTS */
+/* MOMENTS PAGE */
 
 function initMomentsPage() {
   const item = DB.getEntry(currentItemId());
@@ -1120,6 +1204,7 @@ function renderMomentsPageList() {
         <p>Add a scene, panel, image, or memory above.</p>
       </div>
     `;
+
     return;
   }
 
@@ -1156,7 +1241,7 @@ function deleteMomentPage(index) {
   showToast('Moment deleted');
 }
 
-/* MISSING JOURNAL */
+/* MISSING JOURNAL PAGE */
 
 function renderMissingJournalPage(title) {
   const main = document.querySelector('.page-main');

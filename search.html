@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Search — Inkwell</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+</head>
+
+<body data-page="search">
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><i class="ti ti-book-2"></i></div>
+      <span class="nav-logo-text">Inkwell</span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="search.html" class="active">Search</a></li>
+      <li><a href="library.html">My Library</a></li>
+      <li><a href="social.html">Social</a></li>
+    </ul>
+
+    <div class="nav-auth">
+      <button class="btn-ghost" type="button">Log in</button>
+      <button class="btn-primary" type="button">Sign up</button>
+    </div>
+  </nav>
+
+  <main class="container page-main">
+
+    <section class="page-heading">
+      <p class="section-eyebrow">Database search</p>
+      <h1>Search Titles</h1>
+      <p>
+        Search for manga, books, comics, and light novels. Open a title’s detail page,
+        then add it to your library.
+      </p>
+    </section>
+
+    <section class="search-panel">
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon"></i>
+        <input
+          class="search-input"
+          id="database-search"
+          type="text"
+          placeholder="Search manga, books, comics, light novels..."
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="filter-row">
+        <select class="filter-select" id="type-filter">
+          <option value="all">All Types</option>
+          <option value="manga">Manga</option>
+          <option value="books">Books</option>
+          <option value="comics">Comics</option>
+          <option value="lightnovels">Light Novels</option>
+        </select>
+
+        <select class="filter-select" id="genre-filter">
+          <option value="">All Genres</option>
+          <option value="action">Action</option>
+          <option value="adventure">Adventure</option>
+          <option value="comedy">Comedy</option>
+          <option value="drama">Drama</option>
+          <option value="fantasy">Fantasy</option>
+          <option value="horror">Horror</option>
+          <option value="mystery">Mystery</option>
+          <option value="romance">Romance</option>
+          <option value="sci-fi">Sci-Fi</option>
+          <option value="thriller">Thriller</option>
+        </select>
+
+        <input class="filter-input" id="author-filter" type="text" placeholder="Author / creator">
+
+        <select class="filter-select" id="sort-filter">
+          <option value="popular">Most Popular</option>
+          <option value="score">Top Rated</option>
+          <option value="newest">Newest</option>
+        </select>
+
+        <button class="btn-primary" id="search-btn" type="button">
+          <i class="ti ti-search"></i>
+          Search
+        </button>
+      </div>
+    </section>
+
+    <div class="result-count" id="result-count"></div>
+
+    <section class="cards-grid" id="search-results"></section>
+
+    <div class="pagination" id="pagination"></div>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-logo">
+          <div class="nav-logo-icon"><i class="ti ti-book-2"></i></div>
+          <span>Inkwell</span>
+        </div>
+        <p>Your personal reading journal for manga, books, comics, and light novels.</p>
+      </div>
+
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="search.html">Search</a>
+        <a href="library.html">My Library</a>
+        <a href="social.html">Social</a>
+      </div>
+
+      <p class="footer-copy">© 2026 Inkwell. Built for readers.</p>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="index.js"></script>
+</body>
+</html>

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Inkwell — Your Reading Journal</title>
 
   <link rel="stylesheet" href="style.css" />
@@ -12,15 +13,16 @@
 <body data-page="home">
 
   <nav class="navbar">
-    <a href="index.html#home" class="nav-logo">
+    <a href="index.html" class="nav-logo">
       <div class="nav-logo-icon"><i class="ti ti-book-2"></i></div>
       <span class="nav-logo-text">Inkwell</span>
     </a>
 
     <ul class="nav-links">
-      <li><a href="index.html#home">Home</a></li>
-      <li><a href="index.html#library">My Library</a></li>
-      <li><a href="index.html#social">Social</a></li>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="search.html">Search</a></li>
+      <li><a href="library.html">My Library</a></li>
+      <li><a href="social.html">Social</a></li>
     </ul>
 
     <div class="nav-auth">
@@ -31,47 +33,48 @@
 
   <main>
 
-    <!-- HERO -->
-    <section class="hero" id="home">
-      <div class="hero-bg-shape hero-shape-one"></div>
-      <div class="hero-bg-shape hero-shape-two"></div>
+    <section class="home-hero">
+      <div class="hero-shape hero-shape-one"></div>
+      <div class="hero-shape hero-shape-two"></div>
 
       <div class="container hero-grid">
         <div class="hero-copy">
-          <p class="hero-eyebrow hero-animate hero-delay-1">Your reading universe</p>
+          <p class="hero-eyebrow hero-animate delay-1">Your reading universe</p>
 
-          <h1 class="hero-title hero-animate hero-delay-2">
+          <h1 class="hero-title hero-animate delay-2">
             Track every story<br>
             you read and <em>love</em>.
           </h1>
 
-          <p class="hero-sub hero-animate hero-delay-3">
-            Save manga, books, comics, and light novels in one calm personal library.
-            Add notes, favourite quotes, favourite moments, images, and your own score.
+          <p class="hero-sub hero-animate delay-3">
+            Inkwell is a personal reading journal for manga, books, comics, and light novels.
+            Save titles, organize your library, write notes, keep favourite quotes, save moments,
+            and score everything you read.
           </p>
 
-          <div class="hero-actions hero-animate hero-delay-4">
-            <a href="#library" class="btn-primary btn-large">
-              <i class="ti ti-books"></i>
-              Go to My Library
+          <div class="hero-actions hero-animate delay-4">
+            <a href="search.html" class="btn-primary btn-large">
+              <i class="ti ti-search"></i>
+              Search Titles
             </a>
 
-            <a href="#social" class="btn-ghost btn-large">
-              <i class="ti ti-users"></i>
-              Social Preview
+            <a href="library.html" class="btn-ghost btn-large">
+              <i class="ti ti-books"></i>
+              Go to My Library
             </a>
           </div>
         </div>
 
-        <div class="hero-preview hero-animate hero-delay-5">
+        <div class="hero-preview hero-animate delay-5">
           <div class="floating-card">
             <div class="preview-cover">
               <i class="ti ti-book-2"></i>
             </div>
-            <div class="preview-info">
+
+            <div class="preview-content">
               <span class="preview-badge">Reading</span>
               <h3>Your Favourite Story</h3>
-              <p>Notes, quotes, moments, and scores saved in one place.</p>
+              <p>Notes, quotes, moments, images, and scores saved in one calm place.</p>
               <div class="preview-stars">★ ★ ★ ★ ★</div>
             </div>
           </div>
@@ -79,122 +82,99 @@
       </div>
     </section>
 
-    <!-- MY LIBRARY -->
-    <section class="section" id="library">
+    <section class="section">
       <div class="container">
-
-        <div class="section-header">
-          <div>
-            <p class="section-eyebrow">Personal tracker</p>
-            <h2 class="section-title">My Library</h2>
-            <p class="section-subtitle">
-              Search your saved titles, update your status, and open your notes, quotes, moments, or details.
-            </p>
-          </div>
-        </div>
-
-        <div class="library-top">
-
-          <div class="library-search-area">
-            <div class="search-wrap">
-              <i class="ti ti-search search-icon"></i>
-              <input
-                class="search-input"
-                id="library-search"
-                type="text"
-                placeholder="Search your library..."
-                autocomplete="off"
-              />
-            </div>
-
-            <div class="search-results" id="library-search-results"></div>
-          </div>
-
-          <form class="add-title-card" id="add-title-form">
-            <h3>Add a title</h3>
-            <p>Add manga, books, comics, or light novels manually for now.</p>
-
-            <div class="form-grid">
-              <input class="form-input" id="add-title" type="text" placeholder="Title" required>
-              <input class="form-input" id="add-author" type="text" placeholder="Author / Creator">
-              <select class="form-input" id="add-type">
-                <option value="Manga">Manga</option>
-                <option value="Book">Book</option>
-                <option value="Comic">Comic</option>
-                <option value="Light Novel">Light Novel</option>
-              </select>
-              <input class="form-input" id="add-year" type="number" placeholder="Year">
-              <input class="form-input full" id="add-cover" type="url" placeholder="Cover image URL">
-              <select class="form-input full" id="add-status">
-                <option value="reading">Reading</option>
-                <option value="completed">Completed</option>
-                <option value="plantoread">Plan to Read</option>
-                <option value="dropped">Dropped</option>
-              </select>
-            </div>
-
-            <button class="btn-primary full-btn" type="submit">
-              <i class="ti ti-plus"></i>
-              Add to Library
-            </button>
-          </form>
-
-        </div>
-
-        <div class="status-tabs" id="status-tabs">
-          <button class="status-tab active" data-status="reading">Reading</button>
-          <button class="status-tab" data-status="completed">Completed</button>
-          <button class="status-tab" data-status="plantoread">Plan to Read</button>
-          <button class="status-tab" data-status="dropped">Dropped</button>
-        </div>
-
-        <div id="library-content"></div>
-
-      </div>
-    </section>
-
-    <!-- SOCIAL -->
-    <section class="section social-section" id="social">
-      <div class="container">
-
         <div class="section-header center">
-          <p class="section-eyebrow">Coming soon</p>
-          <h2 class="section-title">Social Features</h2>
+          <p class="section-eyebrow">What Inkwell does</p>
+          <h2 class="section-title">A journal for everything you read</h2>
           <p class="section-subtitle">
-            This section is a layout for now. Later, you will be able to share your reading journey with friends.
+            Inkwell is built for readers who want more than a simple list. It helps you remember
+            what you read, what you loved, and what moments mattered.
           </p>
         </div>
 
-        <div class="social-grid">
-          <div class="social-card">
+        <div class="feature-grid">
+          <div class="feature-card">
+            <i class="ti ti-books"></i>
+            <h3>Organize Your Library</h3>
+            <p>Track Reading, Completed, Plan to Read, and Dropped titles.</p>
+          </div>
+
+          <div class="feature-card">
+            <i class="ti ti-notes"></i>
+            <h3>Write Personal Notes</h3>
+            <p>Save reviews, theories, thoughts, and reactions for every title.</p>
+          </div>
+
+          <div class="feature-card">
+            <i class="ti ti-quote"></i>
+            <h3>Save Favourite Quotes</h3>
+            <p>Keep meaningful lines with chapter, page, or volume information.</p>
+          </div>
+
+          <div class="feature-card">
+            <i class="ti ti-photo"></i>
+            <h3>Save Favourite Moments</h3>
+            <p>Save scenes, panels, descriptions, and images that stood out.</p>
+          </div>
+
+          <div class="feature-card">
+            <i class="ti ti-star"></i>
+            <h3>Score Everything</h3>
+            <p>Give every title your own personal score from 1 to 10.</p>
+          </div>
+
+          <div class="feature-card">
             <i class="ti ti-users"></i>
-            <h3>Friend Activity</h3>
-            <p>See what your friends are reading, completing, and recommending.</p>
-            <button disabled>Coming Soon</button>
+            <h3>Social Coming Soon</h3>
+            <p>Later, share reading lists, reviews, and recommendations with friends.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section soft-section">
+      <div class="container">
+        <div class="section-header center">
+          <p class="section-eyebrow">How it works</p>
+          <h2 class="section-title">Simple reading flow</h2>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <span>1</span>
+            <h3>Search</h3>
+            <p>Find manga, books, comics, or light novels from the database.</p>
           </div>
 
-          <div class="social-card">
-            <i class="ti ti-share-3"></i>
-            <h3>Shared Libraries</h3>
-            <p>Share your reading lists and discover shelves made by other readers.</p>
-            <button disabled>Coming Soon</button>
+          <div class="step-card">
+            <span>2</span>
+            <h3>Add</h3>
+            <p>Add a title to Reading, Completed, Plan to Read, or Dropped.</p>
           </div>
 
-          <div class="social-card">
-            <i class="ti ti-message-circle"></i>
-            <h3>Reviews & Comments</h3>
-            <p>Post reviews, comment on stories, and talk about favourite moments.</p>
-            <button disabled>Coming Soon</button>
+          <div class="step-card">
+            <span>3</span>
+            <h3>Track</h3>
+            <p>Open your library and manage saved titles.</p>
           </div>
 
-          <div class="social-card">
-            <i class="ti ti-sparkles"></i>
-            <h3>Recommendations</h3>
-            <p>Recommend manga, books, comics, and light novels to your friends.</p>
-            <button disabled>Coming Soon</button>
+          <div class="step-card">
+            <span>4</span>
+            <h3>Remember</h3>
+            <p>Write notes, quotes, moments, and give your own score.</p>
           </div>
         </div>
 
+        <div class="cta-box">
+          <h2>Start building your reading journal.</h2>
+          <p>Search the database and add your first title to Inkwell.</p>
+
+          <a href="search.html" class="btn-primary btn-large">
+            <i class="ti ti-search"></i>
+            Search Titles
+          </a>
+        </div>
       </div>
     </section>
 
@@ -211,9 +191,10 @@
       </div>
 
       <div class="footer-links">
-        <a href="index.html#home">Home</a>
-        <a href="index.html#library">My Library</a>
-        <a href="index.html#social">Social</a>
+        <a href="index.html">Home</a>
+        <a href="search.html">Search</a>
+        <a href="library.html">My Library</a>
+        <a href="social.html">Social</a>
       </div>
 
       <p class="footer-copy">© 2026 Inkwell. Built for readers.</p>

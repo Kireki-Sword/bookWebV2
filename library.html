@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Details — Inkwell</title>
+  <title>My Library — Inkwell</title>
 
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 </head>
 
-<body data-page="detail">
+<body data-page="library">
 
   <nav class="navbar">
     <a href="index.html" class="nav-logo">
@@ -21,7 +21,7 @@
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="search.html">Search</a></li>
-      <li><a href="library.html">My Library</a></li>
+      <li><a href="library.html" class="active">My Library</a></li>
       <li><a href="social.html">Social</a></li>
     </ul>
 
@@ -32,12 +32,38 @@
   </nav>
 
   <main class="container page-main">
-    <a class="back-link" href="javascript:history.back()">
-      <i class="ti ti-arrow-left"></i>
-      Back
-    </a>
 
-    <section id="detail-content"></section>
+    <section class="page-heading">
+      <p class="section-eyebrow">Personal tracker</p>
+      <h1>My Library</h1>
+      <p>
+        Search your saved titles, manage your statuses, add notes, save quotes,
+        keep favourite moments, and score your books.
+      </p>
+    </section>
+
+    <section class="library-search-panel">
+      <div class="search-wrap">
+        <i class="ti ti-search search-icon"></i>
+        <input
+          class="search-input"
+          id="library-search"
+          type="text"
+          placeholder="Search your saved library..."
+          autocomplete="off"
+        />
+      </div>
+    </section>
+
+    <div class="status-tabs" id="status-tabs">
+      <button class="status-tab active" data-status="reading">Reading</button>
+      <button class="status-tab" data-status="completed">Completed</button>
+      <button class="status-tab" data-status="plantoread">Plan to Read</button>
+      <button class="status-tab" data-status="dropped">Dropped</button>
+    </div>
+
+    <section id="library-content"></section>
+
   </main>
 
   <footer class="footer">
